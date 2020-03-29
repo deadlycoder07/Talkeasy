@@ -3,19 +3,24 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Nav}  from 'react-bootstrap';
 import {Navbar,FormControl,Form,Button} from 'react-bootstrap';
 import 'antd/dist/antd.css';
+import { BrowserView, MobileView } from 'react-device-detect';
 
-
-class Header extends React.Component {
-
-    render() {
-        return (
-            <div className="menu">
+const CustomLayout = (props) => {
+        return(
+            <div className="layout">
+             <div className="menu">
                 <Navbar collapseOnSelect expand="lg" bg="primary" variant="dark">
                     <Navbar.Brand href="#home">Talkeasy</Navbar.Brand>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="mr-auto">
-                    <Nav.Link href="login">Login</Nav.Link>
+                        {
+                            props.isAuthenticated ?
+                            <Nav.Link href="logout">Logout</Nav.Link>
+                            :
+                            <Nav.Link href="login">Login</Nav.Link>
+                        }
+                    
                     <Nav.Link href="#pricing">About</Nav.Link>
                     </Nav>
                     <Form inline>
@@ -25,7 +30,13 @@ class Header extends React.Component {
                 </Navbar.Collapse>
                 </Navbar>
           </div>
+             <div className="content">
+                 {props.children} 
+             </div>
+            </div>
+         
         );
-    }
+    
 }
-export default Header;
+
+export default CustomLayout;

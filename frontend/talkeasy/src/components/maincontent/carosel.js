@@ -2,29 +2,30 @@ import React from "react";
 import "antd/dist/antd.css";
 import { Carousel } from "antd";
 
+import { Button } from "antd";
 
-function headercontent() {
-    return (
-        <div>
-            <Carousel autoplay>
-                <div>
-                    <h3>1</h3>
-                </div>
-                <div>
-                    <h3>2</h3>
-                </div>
-                <div>
-                    <h3>3</h3>
-                </div>
-                <div>
-                    <h3>4</h3>
-                </div>
-                <div>
-                    <h3>5</h3>
-                </div>
+class CustomCarousel extends React.Component {
+    render(){
+        return (
+            <div>
+             <Carousel autoplay>
+              <div>
+                <h1 style={{ color: "white" }}>Connect with your friends</h1>
+              </div>
+              <div>
+                <h1 style={{ color: "white" }}>Register Now if  you have not yet!</h1>
+              </div>
+    
             </Carousel>
-            <h1>i wanna know if it at alll works</h1>
-        </div>
-    )
+                <div className="btnpanel" style={{textAlign:"center"}}>
+               <a href='register'><Button type="danger" shape="round" style={{ marginTop: 4 }}>Register</Button></a>
+               <a href='/login'><Button type="danger" shape="round" style={{ marginTop: 4, marginLeft: 5 }}>Login</Button></a> 
+                </div>
+            </div>
+        
+
+        );
+        }
+   
 }
-export default headercontent;
+export default CustomCarousel;

@@ -1,32 +1,47 @@
-import React from 'react';
+import React, { Component } from 'react';
 import './App.css';
+import {BrowserRouter as Router } from 'react-router-dom';
+import BaseRouter from './routes';
+import {connect} from  'react-redux'; 
 import 'antd/dist/antd.css';
-import { Button } from "antd";
-import Header from './components/navbar/Header';
-import { Carousel } from "antd";
+import CustomLayout from './containers/CustomLayout';
+import * as actions from './store/actions/auth';
+import { BrowserView, MobileView } from 'react-device-detect';
+import MobileLayout from './containers/MobileView/MobileLayout';
+class App extends Component {
+  componentDidMount(){
+    this.props.onTryAutoSignup();
+  }
+  render(){
+    return (
+      <div>
+        <Router>
+          <BrowserView>
+          <CustomLayout {...this.props}>
+            <BaseRouter/>
+          </CustomLayout>
+          </BrowserView>
+          <MobileView>
+           <MobileLayout {...this.props}>
+            <BaseRouter/>
+           </MobileLayout>
+          </MobileView>
+          
+        </Router>   
+      </div>
+    );
+  }
+}
+const mapStateToProps = state => {
+    return{
+      isAuthenticated: state.token !== null 
+    }
+  }
 
-function App() {
-  return (
-    <div className="App">
-      <Header />
-      <headercontent>
-        <Carousel autoplay>
-          <div>
-            <h1 style={{ color: "white" }}>Connect with your friends</h1>
-          </div>
-          <div>
-            <h1 style={{ color: "white" }}>Register Now if  you have not yet!</h1>
-          </div>
-
-        </Carousel>
-        <div className="btnpanel">
-          <Button type="danger" shape="round" style={{ marginTop: 4 }}>Register</Button>
-          <Button type="danger" shape="round" style={{ marginTop: 4, marginLeft: 5 }}>Login</Button>
-        </div>
-
-      </headercontent>
-    </div>
-  );
+const mapDispatchToProps = dispatch => {
+  return {
+    onTryAutoSignup: () => dispatch(actions.authCheckState())
+  }
 }
 
-export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);

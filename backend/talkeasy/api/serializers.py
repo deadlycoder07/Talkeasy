@@ -1,21 +1,25 @@
 from rest_framework import routers, serializers, viewsets
 from django.contrib.auth.models import User
 from chatserver.models import Messages
+from django.contrib.auth import authenticate
 
-
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'password']
+        fields = ('id', 'username', 'password')
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = User.objects.create_user(validated_data['username'],
+                                        None,
+                                        validated_data['password'])
+        return user
 
 
-# ViewSets define the view behavior.
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username')
 
 class MessageSerializer(serializers.ModelSerializer):
     """For Serializing Message"""
@@ -27,3 +31,13 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Messages
         fields = ['sender', 'receiver', 'message', 'timestamp']
+
+class LoginUserSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        user = authenticate(**data)
+        if user and user.is_active:
+            return user
+        raise serializers.ValidationError("Unable to log in with provided credentials.")

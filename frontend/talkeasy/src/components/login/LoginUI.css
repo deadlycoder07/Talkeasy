@@ -1,0 +1,9 @@
+.login{
+   margin: 100px;
+   border: 1px solid grey;
+   padding: 10px;
+}
+.loginButton{
+    float: right;
+    margin-right: 10px;
+}
