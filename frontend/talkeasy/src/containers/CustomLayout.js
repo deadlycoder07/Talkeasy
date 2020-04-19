@@ -3,7 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Nav}  from 'react-bootstrap';
 import {Navbar,FormControl,Form,Button} from 'react-bootstrap';
 import 'antd/dist/antd.css';
-import { BrowserView, MobileView } from 'react-device-detect';
 
 const CustomLayout = (props) => {
         return(

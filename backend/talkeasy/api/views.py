@@ -3,11 +3,11 @@ from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from chatserver.models import Messages
-from .serializers import MessageSerializer,CreateUserSerializer,UserSerializer,LoginUserSerializer
+from .serializers import MessageSerializer
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from knox.models import AuthToken# Create your views here.
-
+from django.contrib.auth import authenticate
 def message_list(request, sender=None, receiver=None):
     if request.method == 'GET':
         print(sender)
@@ -31,26 +31,3 @@ def message_view(request, sender, receiver):
        serializer=MessageSerializer(messages,many=True, context={'request':request})
        return JsonResponse(serializer.data,safe=False)
 
-class RegistrationAPI(generics.GenericAPIView):
-    serializer_class = CreateUserSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
-            "token": AuthToken.objects.create(user)
-        })
-
-class LoginAPI(generics.GenericAPIView):
-    serializer_class = LoginUserSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data
-        return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
-            "token": AuthToken.objects.create(user)
-        })

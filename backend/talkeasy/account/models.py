@@ -1,92 +1,67 @@
+
+import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.conf import settings
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
-class AccountManager(BaseUserManager):
-    def create_user(self, username, email, password=None):
+class UserManager(BaseUserManager):
+    '''
+    creating a manager for a custom user model
+    https://docs.djangoproject.com/en/3.0/topics/auth/customizing/#writing-a-manager-for-a-custom-user-model
+    https://docs.djangoproject.com/en/3.0/topics/auth/customizing/#a-full-example
+    '''
+    def create_user(self, email, password=None):
+        """
+        Create and return a `User` with an email, username and password.
+        """
+        if not email:
+            raise ValueError('Users Must Have an email address')
 
-        if not username:
-            raise ValueError("Users must have an unique username")
         user = self.model(
-
-            username=username,
-
+            email=self.normalize_email(email),
         )
-
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, first_name, last_name,  password):
-        user = self.create_user(
-            email=self.normalize_email(email),
-            username=username,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
+    def create_superuser(self, email, password):
+        """
+        Create and return a `User` with superuser (admin) permissions.
+        """
+        if password is None:
+            raise TypeError('Superusers must have a password.')
 
-        )
-
-        user.is_admin = True
-        user.is_staff = True
+        user = self.create_user(email, password)
         user.is_superuser = True
-        user.save(using=self._db)
+        user.is_staff = True
+        user.save()
+
         return user
 
 
-class Account(AbstractBaseUser):
-    email = models.EmailField(verbose_name="EmailId",
-                              max_length=100, unique=True)
-    username = models.CharField(max_length=40, unique=True)
-    date_joined = models.DateTimeField(
-        verbose_name="Date Joined", auto_now_add=True)
-    last_login = models.DateTimeField(verbose_name="Last Login", auto_now=True)
-    is_admin = models.BooleanField(default=False)
+class User(AbstractBaseUser):
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(
+        verbose_name='email address',
+        max_length=255,
+        unique=True
+        )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    Following = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name='Users being follwed+')
-    FollowedBy = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name='Users following+')
-
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    REQUIRED_FIELDS = []
 
-    objects = AccountManager()
-
-    def __str__(self):
-        return self.email + ", " + self.username
-
-    def has_perm(self, perm, obj=None):
-        return self.is_admin
-
-    def has_module_perms(self, app_Label):
-        return True
-
-
-class UserFollow(models.Model):
-    followed = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='User being followed+')
-    follower = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='User following+')
+    # Tells Django that the UserManager class defined above should manage
+    # objects of this type.
+    objects = UserManager()
 
     def __str__(self):
-        return self.follower.username + '->' + self.followed.username
+        return self.email
 
-    def save(self, *args, **kwargs):
-        super(UserFollow, self).save(*args, **kwargs)
-        userfollowed = self.followed
-        userfollowing = self.follower
-        userfollowed.FollowedBy.add(self.follower)
-        userfollowing.Following.add(self.followed)
-
-    def delete(self, *args, **kwargs):
-        userfollowed = self.followed
-        userfollowing = self.follower
-        userfollowed.FollowedBy.remove(self.follower)
-        userfollowing.Following.remove(self.followed)
-        super(UserFollow, self).delete(*args, **kwargs)
+    class Meta:
+        '''
+        to set table name in database
+        '''
+        db_table = "login"

@@ -3,7 +3,7 @@ import {Route} from 'react-router-dom';
 import CustomCarousel from './components/maincontent/carosel';
 import ChatUI from './components/maincontent/ChatUI';
 import LoginUI from './components/login/LoginUI';
-import {isMobile} from 'react-device-detect';
+
 const BaseRouter = () =>(
     <div>
         <Route exact path='/' component={CustomCarousel}/>

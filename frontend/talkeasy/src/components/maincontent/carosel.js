@@ -1,7 +1,6 @@
 import React from "react";
 import "antd/dist/antd.css";
 import { Carousel } from "antd";
-
 import { Button } from "antd";
 
 class CustomCarousel extends React.Component {
